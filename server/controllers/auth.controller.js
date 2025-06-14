@@ -9,13 +9,13 @@ export const register = async (req, res) => {
         const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
-            return res.json({ success: false, message: "All fields are required" });
+            return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
         //Check is user already exists
         const user = await User.findOne({ email });
         if (user) {
-            return res.json({ success: false, message: "User exists already" });
+            return res.status(409).json({ success: false, message: "User exists already" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,10 +32,10 @@ export const register = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.json({ success: true });
+        return res.status(201).json({ success: true });
 
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
@@ -45,17 +45,17 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.json({ success: false, message: "Invalid credentials" });
+            return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
 
-        const user = await userModel.findOne({ email });
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.json({ success: false, message: "Something went wrong" });
+            return res.status(401).json({ success: false, message: "Something went wrong" });
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.json({ success: false, message: "Invalid credentials" });
+            return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -67,10 +67,10 @@ export const login = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.json({ success: true });
+        return res.status(200).json({ success: true });
 
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
@@ -83,18 +83,18 @@ export const logout = (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? 'none' : 'strict',
         })
 
-        return res.json({ success: true, message: "Logged Out" });
+        return res.status(200).json({ success: true, message: "Logged Out" });
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
 //API to check if user is Authenticated
 export const isAuthenticated = async (req, res) => {
     try {
-        return res.json({ success: true });
+        return res.stayus(200).json({ success: true });
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message })
     }
 }
 
