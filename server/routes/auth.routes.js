@@ -1,4 +1,12 @@
 import express from 'express';
-const appRouter = express.Router();
+const authRouter = express.Router();
+import { register, login, logout, isAuthenticated } from "../controllers/auth.controller.js";
+import { protect } from "../middlewares/auth.middleware.js"
 
-export default appRouter;
+authRouter.post('/register', register);
+authRouter.post('/login', login);
+authRouter.post('/logout', protect, logout);
+authRouter.get('/isAuth', protect, isAuthenticated);
+
+
+export default authRouter;

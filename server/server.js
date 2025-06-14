@@ -1,8 +1,9 @@
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
-import appRouter from './routes/auth.routes.js'
+import authRouter from './routes/auth.routes.js'
 
 //Configurations
 import connectDB from './config/db.config.js';
@@ -13,9 +14,10 @@ app.use(cors());
 
 //Middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 //Routes
-app.use('/api/auth', appRouter);
+app.use('/api/auth', authRouter);
 
 //CheckUP API
 app.get('/', (req, res) => { res.send("Klyora API Working...") });
