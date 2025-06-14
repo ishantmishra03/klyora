@@ -11,7 +11,7 @@ FONT -  | Inter  | + |  Playfair  |
 | **Royal Indigo**  | #3C4A9A | Accent (links, subtle emphasis)           |
 
 Usage Tips:
-Dark on Light UI: Use Midnight Blue for text/icons on a white background.
+( Dark on Light UI ): Use Midnight Blue for text/icons on a white background 
 
 CTA Buttons: Midnight Blue button with Lavender Tint hover effect.
 
