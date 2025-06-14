@@ -1,0 +1,20 @@
+FONT -  | Inter  | + |  Playfair  |
+
+
+| Name              | Hex       | Use                                       |
+| ----------------- | --------- | ----------------------------------------- |
+| **Midnight Blue** | #0A1F44 | Primary (headers, buttons, accents)       |
+| **Soft White**    | #FDFDFD | Backgrounds, cards                        |
+| **Cool Gray**     | #DCE0E6 | Borders, secondary backgrounds            |
+| **Silver Mist**   | #C1C7D0 | Text, icons (on dark backgrounds)         |
+| **Lavender Tint** | #E5E9F7 | Subtle highlight (hover, background glow) |
+| **Royal Indigo**  | #3C4A9A | Accent (links, subtle emphasis)           |
+
+Usage Tips:
+Dark on Light UI: Use Midnight Blue for text/icons on a white background.
+
+CTA Buttons: Midnight Blue button with Lavender Tint hover effect.
+
+Card UI: White cards on Cool Gray sections with soft Royal Indigo borders.
+
+Typography: Stick to dark blue (#0A1F44) for primary titles and muted gray for supporting text.
