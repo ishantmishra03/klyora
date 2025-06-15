@@ -1,15 +1,32 @@
 import Product from '../models/product.models.js';
+import imagekit from '../config/imagekit.config.js';
 
 // API to create a new product
 export const addProduct = async (req, res) => {
     try {
         //Get all from frontend
-        const { productName, description, price, images, category, subCategory } = req.body;
+        const { productName, description, price, category, subCategory } = req.body;
 
         //Checks if all present
         if (!productName || !price || !images || !category || !description || !subCategory) {
             return res.status(400).json({ success: false, error: 'Missing required fields' });
         }
+
+        // Ensure images are uploaded
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: "Please upload at least one image" });
+        }
+
+        // Upload images to ImageKit
+        const uploadPromises = req.files.map((file) =>
+            imagekit.upload({
+                file: file.buffer,
+                fileName: file.originalname,
+            })
+        );
+
+        const uploadResults = await Promise.all(uploadPromises);
+        const images = uploadResults.map(img => img.url);
 
         //Creating new product in DB
         const newProduct = await Product.create({
@@ -84,7 +101,7 @@ export const getProductById = async (req, res) => {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        return res.status(200).json({success: true, product});
+        return res.status(200).json({ success: true, product });
     } catch (error) {
         return res.status(500).json({ success: false, error: 'Server error' });
     }
