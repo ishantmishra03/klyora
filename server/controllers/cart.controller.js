@@ -6,7 +6,7 @@ export const addToCart = async (req, res) => {
     try {
         //Get productId to add in cart from frontend
         //Actions like ( increment ) and ( decrement ) if already exists in cart
-        const { productId, action } = req.body;
+        const { productId, action = 'increment' } = req.body;
 
         if (!productId) {
             return res.status(400).json({ success: false, message: 'Product ID is required' });
@@ -97,7 +97,7 @@ export const removeFromCart = async (req, res) => {
 //Get Current User's cart 
 export const getCart = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).populate('cart');
+        const user = await User.findById(req.userId).populate('cart.product');
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
