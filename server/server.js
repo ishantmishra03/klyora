@@ -1,4 +1,5 @@
 import express from 'express';
+const app = express();
 import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -14,7 +15,22 @@ import connectDB from './config/db.config.js';
 await connectDB();
 
 //CORS
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // allows cookies to be sent
+}));
 
 //Middlewares
 app.use(express.json());

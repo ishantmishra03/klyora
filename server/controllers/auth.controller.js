@@ -32,9 +32,10 @@ export const register = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(201).json({ success: true });
+        return res.json({ success: true, user: createdUser.name });
 
     } catch (error) {
+        console.log("Register Error", error);
         res.status(500).json({ success: false, message: error.message })
     }
 }
@@ -67,7 +68,7 @@ export const login = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, user: user.name });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
@@ -92,7 +93,7 @@ export const logout = (req, res) => {
 //API to check if user is Authenticated
 export const isAuthenticated = async (req, res) => {
     try {
-        return res.stayus(200).json({ success: true });
+        return res.status(200).json({ success: true });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
     }

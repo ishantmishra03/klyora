@@ -1,5 +1,5 @@
 import "./globals.css";
-import { AppProvider } from "@/context/AppContext";
+import { ReduxProvider } from "../redux/ReduxProvider";
 
 export const metadata = {
   title: "Klyora",
@@ -10,7 +10,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AppProvider>{children}</AppProvider>
+        <ReduxProvider>
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );

@@ -46,7 +46,7 @@ export const getAllOrders = async (req, res) => {
 // Get single order by ID
 export const getOrderById = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderId } = req.body;
     const order = await Order.findById(orderId).populate('products.product');
 
     if (!order) {
