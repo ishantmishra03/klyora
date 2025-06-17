@@ -32,10 +32,9 @@ export const register = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.json({ success: true, user: createdUser.name });
+        res.json({ success: true, user: createdUser.name, message : "Registered successfully" });
 
     } catch (error) {
-        console.log("Register Error", error);
         res.status(500).json({ success: false, message: error.message })
     }
 }
@@ -46,17 +45,17 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: "Invalid credentials" });
+            return res.json({ success: false, message: "Invalid credentials" });
         }
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ success: false, message: "Something went wrong" });
+            return res.json({ success: false, message: "Something went wrong" });
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.status(401).json({ success: false, message: "Invalid credentials" });
+            return res.json({ success: false, message: "Invalid credentials" });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -68,7 +67,7 @@ export const login = async (req, res) => {
             maxAge: 1 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(200).json({ success: true, user: user.name });
+        res.status(200).json({ success: true, user: user.name, message : "LoggedIn Successfully" });
 
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
@@ -84,7 +83,7 @@ export const logout = (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? 'none' : 'strict',
         })
 
-        return res.status(200).json({ success: true, message: "Logged Out" });
+        res.status(200).json({ success: true, message: "Logged Out" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
     }

@@ -29,7 +29,7 @@ const Home = () => {
 
   const user = useSelector((state) => state.auth.user);
   console.log(user);
-  return <div>Hello, {user?.name || 'Guest'}</div>;
+  return <div className="mt-40">Hello, {user?.name || 'Guest'}</div>;
 };
 
 export default Home;

@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from '../../config/axios';
 import { setUser, setLoading } from '../../redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 export default function Auth() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Auth() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  //Handle Auth Functionality
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -24,20 +26,22 @@ export default function Auth() {
         if (data.success) {
           dispatch(setUser(data.user));
           router.push('/');
+          toast.success(data.message);
         } else {
-          console.log(data.message);
+          toast.error(data.message)
         }
       } else {
         const { data } = await axios.post('/api/auth/register', { name: form.name, email: form.email, password: form.password });
         if (data.success) {
           dispatch(setUser(data.user));
           router.push('/');
+          toast.success(data.message);
         } else {
-          console.log(data.message);
+          toast.error(data.message);
         }
       }
     } catch (error) {
-      console.log(error.message);
+      toast.error(error.message);
     } finally {
       dispatch(setLoading(false));
     }

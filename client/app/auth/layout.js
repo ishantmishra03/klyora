@@ -1,4 +1,5 @@
-import '../globals.css'
+import '../globals.css';
+
 export const metadata = {
   title: "Klyora | Auth",
   description: "Sign in or create your Klyora account",
@@ -6,10 +7,8 @@ export const metadata = {
 
 export default function AuthLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
-        {children}
-      </body>
-    </html>
+    <div className="min-h-screen font-inter bg-soft-white text-midnight-blue">
+      {children}
+    </div>
   );
 }
