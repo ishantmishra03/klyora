@@ -1,13 +1,12 @@
-'use client';
 import React, { useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { logoutUser } from '../../redux/slices/authSlice';
 import { toast } from 'react-hot-toast';
 import axios from '../../config/axios';
 
-const Page = () => {
-    const router = useRouter();
+const Logout = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const logout = useCallback(async () => {
@@ -15,7 +14,7 @@ const Page = () => {
             const { data } = await axios.post('/api/auth/logout');
             if(data.success){
                 dispatch(logoutUser());
-                router.push('/');
+                navigate('/');
                 toast.success(data.message);
             } else {
                 toast.error(data.message);
@@ -23,7 +22,7 @@ const Page = () => {
         } catch (error) {
             toast.error(error.message);
         }
-    },[dispatch ,router]);
+    },[dispatch ,navigate]);
 
     useEffect(() => {
         logout();
@@ -34,4 +33,4 @@ const Page = () => {
     )
 }
 
-export default Page
+export default Logout

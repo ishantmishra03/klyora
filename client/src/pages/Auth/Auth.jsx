@@ -1,14 +1,12 @@
-'use client';
-
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from '../../config/axios';
 import { setUser, setLoading } from '../../redux/slices/authSlice';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
 export default function Auth() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(true);
   const loading = useSelector((state) => state.auth.loading);
@@ -25,7 +23,7 @@ export default function Auth() {
         const { data } = await axios.post('/api/auth/login', { email: form.email, password: form.password });
         if (data.success) {
           dispatch(setUser(data.user));
-          router.push('/');
+          navigate('/');
           toast.success(data.message);
         } else {
           toast.error(data.message)
@@ -34,7 +32,7 @@ export default function Auth() {
         const { data } = await axios.post('/api/auth/register', { name: form.name, email: form.email, password: form.password });
         if (data.success) {
           dispatch(setUser(data.user));
-          router.push('/');
+          navigate('/');
           toast.success(data.message);
         } else {
           toast.error(data.message);
