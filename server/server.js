@@ -9,6 +9,7 @@ import productRouter from './routes/product.routes.js';
 import cartRouter from './routes/cart.routes.js';
 import orderRouter from './routes/order.routes.js';
 import paymentRouter from './routes/payment.routes.js';
+import adminRouter from './routes/admin.routes.js';
 
 //Configurations
 import connectDB from './config/db.config.js';
@@ -43,6 +44,7 @@ app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/payment', paymentRouter);
+app.use('/api/admin', adminRouter);
 
 //CheckUP API
 app.get('/', (req, res) => { res.send("Klyora API Working...") });

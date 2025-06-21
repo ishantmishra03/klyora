@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Lora&display=swap');
+
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2 {
+  font-family: 'Lora', serif;
+}
+
+.text-royal-indigo{
+  color: #3C4A9A;
+}
+.bg-royal-indigo{
+  background-color: #3C4A9A;
+}
+
+.text-midnight-blue{
+  color: #0A1F44;
+}
+.bg-midnight-blue{
+  background-color: #0A1F44;
+}
+.border-midnight-blue{
+  border-color: #0A1F44;
+}
+.bg-soft-white{
+  background-color: #FDFDFD;
+}
+.text-soft-white{
+  color: #FDFDFD;
+}
+.border-cool-gray{
+  border-color: #DCE0E6;
+}
+.bg-cool-gray{
+  background-color: #DCE0E6;
+}
+.text-silver-mist{
+  color: #C1C7D0;
+}
+.bg-lavender-tint{
+  background-color: #E5E9F7;
+}
+.from-midnight-blue{
+  background-color: #0A1F44;
+}
+.to-royal-indigo{
+  background-color: #3C4A9A;
+}
