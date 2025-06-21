@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "./redux/slices/authSlice";
+import { fetchCart } from './redux/slices/cartSlice';
 import axios from "./config/axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
@@ -9,6 +10,7 @@ import Logout from "./pages/Logout/Logout";
 import Auth from "./pages/Auth/Auth";
 import Products from "./pages/Products";
 import Product from "./pages/Product";
+import Orders from './pages/Orders';
 import Cart from "./pages/Cart/Cart";
 import ProtectedRoute from "./config/ProtectedRoute";
 
@@ -30,6 +32,7 @@ const App = () => {
 
   useEffect(() => {
     fetchUser();
+    dispatch(fetchCart());
   }, [fetchUser]);
 
   useEffect(() => {
@@ -63,6 +66,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
             </ProtectedRoute>
           }
         />

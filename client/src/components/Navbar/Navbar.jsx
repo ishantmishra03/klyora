@@ -5,12 +5,11 @@ import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const cartItems = useSelector((state) => state.cart.items) || [];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
   const closeMenu = () => {
     setIsMenuOpen(false);
-    setCartCount(0);
   }
 
   return (
@@ -63,7 +62,7 @@ const Navbar = () => {
                 className="bg-midnight-blue text-soft-white px-4 py-2 rounded-full hover:bg-royal-indigo transition-all duration-300 flex items-center space-x-2 font-medium cursor-pointer"
               >
                 <ShoppingBag size={16} />
-                <span>Cart ({cartCount})</span>
+                <span>Cart ({cartItems.length})</span>
               </Link>
             )}
           </div>

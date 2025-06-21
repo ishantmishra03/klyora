@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '../../config/axios'; 
+import axios from '../../config/axios';
+import { toast } from 'react-hot-toast';
 
 // Get Cart
 export const fetchCart = createAsyncThunk('cart/fetchCart', async () => {
@@ -7,30 +8,79 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async () => {
   return res.data.cart;
 });
 
-// Add or update (increment/decrement) cart item
-export const updateCart = createAsyncThunk(
-  'cart/updateCart',
-  async ({ productId, action }) => {
-    const res = await axios.post('/cart/add', { productId, action });
-    return res.data.cart;
+// Add to cart (only if not already in cart)
+export const addToCart = createAsyncThunk(
+  'cart/addToCart',
+  async (productId, thunkAPI) => {
+    try {
+      const res = await axios.post('/api/cart/add', { productId });
+      if (res.data.success) toast.success(res.data.message);
+      return res.data.cart;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add to cart');
+      return thunkAPI.rejectWithValue(err.response?.data?.message);
+    }
   }
 );
 
-// Remove item
+//  Increment quantity
+export const incrementCartItem = createAsyncThunk(
+  'cart/incrementCartItem',
+  async (productId, thunkAPI) => {
+    try {
+      const res = await axios.post('/api/cart/inc1', { productId });
+      if (res.data.success) toast.success(res.data.message);
+      return res.data.cart;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to increment');
+      return thunkAPI.rejectWithValue(err.response?.data?.message);
+    }
+  }
+);
+
+// 🔽 Decrement quantity
+export const decrementCartItem = createAsyncThunk(
+  'cart/decrementCartItem',
+  async (productId, thunkAPI) => {
+    try {
+      const res = await axios.post('/api/cart/dec1', { productId });
+      if (res.data.success) toast.success(res.data.message);
+      return res.data.cart;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to decrement');
+      return thunkAPI.rejectWithValue(err.response?.data?.message);
+    }
+  }
+);
+
+// Remove item completely
 export const removeCartItem = createAsyncThunk(
   'cart/removeCartItem',
-  async (productId) => {
-    const res = await axios.post('/cart/remove', { productId });
-    return res.data.cart;
+  async (productId, thunkAPI) => {
+    try {
+      const res = await axios.post('/api/cart/remove', { productId });
+      if (res.data.success) toast.success(res.data.message);
+      return res.data.cart;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove');
+      return thunkAPI.rejectWithValue(err.response?.data?.message);
+    }
   }
 );
 
 // Clear cart
-export const clearCart = createAsyncThunk('cart/clearCart', async () => {
-  const res = await axios.delete('/cart/clear');
-  return res.data.cart;
+export const clearCart = createAsyncThunk('cart/clearCart', async (_, thunkAPI) => {
+  try {
+    const res = await axios.delete('/api/cart/clear');
+    if (res.data.success) toast.success(res.data.message);
+    return res.data.cart;
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to clear cart');
+    return thunkAPI.rejectWithValue(err.response?.data?.message);
+  }
 });
 
+// Slice
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
@@ -41,6 +91,7 @@ const cartSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // fetch
       .addCase(fetchCart.pending, (state) => {
         state.loading = true;
       })
@@ -50,14 +101,30 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
-      .addCase(updateCart.fulfilled, (state, action) => {
+
+      // add
+      .addCase(addToCart.fulfilled, (state, action) => {
         state.items = action.payload;
       })
+
+      // increment
+      .addCase(incrementCartItem.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
+
+      // decrement
+      .addCase(decrementCartItem.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
+
+      // remove
       .addCase(removeCartItem.fulfilled, (state, action) => {
         state.items = action.payload;
       })
+
+      // clear
       .addCase(clearCart.fulfilled, (state) => {
         state.items = [];
       });
