@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema(
   {
-    productName: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -16,12 +16,31 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    originalPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     images: [
       {
-        type: String, 
+        type: String,
         required: true,
-      }
+      },
     ],
+    rating: {
+      type: Number,
+      default: 4.0,
+      min: 0,
+      max: 5,
+    },
+    reviews: {
+      type: Number,
+      default: 0,
+    },
+    badge: {
+      type: String,
+      trim: true,
+    },
     category: {
       type: String,
       required: true,
@@ -30,6 +49,18 @@ const productSchema = new mongoose.Schema(
     subCategory: {
       type: String,
       trim: true,
+    },
+    inStock: {
+      type: Boolean,
+      default: true,
+    },
+    isNew: {
+      type: Boolean,
+      default: false,
+    },
+    onSale: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
