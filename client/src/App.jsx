@@ -4,9 +4,11 @@ import { setUser } from "./redux/slices/authSlice";
 import axios from "./config/axios";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
+import Navbar from "./components/Navbar/Navbar";
 import Logout from "./pages/Logout/Logout";
 import Auth from "./pages/Auth/Auth";
 import Products from "./pages/Products";
+import Product from "./pages/Product";
 import Cart from "./pages/Cart/Cart";
 import ProtectedRoute from "./config/ProtectedRoute";
 
@@ -42,10 +44,12 @@ const App = () => {
 }, [location, navigate]);
   return (
     <div>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/product/:id" element={<Product />} />
         <Route
           path="/logout"
           element={

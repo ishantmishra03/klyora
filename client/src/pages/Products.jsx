@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import axios from '../config/axios';
+import { Link } from 'react-router-dom';
 import { 
   Star, 
   ShoppingBag, 
@@ -12,69 +14,10 @@ import {
   X,
 } from 'lucide-react';
 
-// Generate 100 products with realistic data
-const generateProducts = () => {
-  const categories = ['Electronics', 'Fashion', 'Home & Living', 'Sports & Fitness', 'Beauty & Care', 'Books & Media', 'Accessories', 'Furniture'];
-  const badges = ['Best Seller', 'New', 'Limited', 'Sale', 'Popular', 'Trending', 'Premium', 'Exclusive'];
-  const productNames = [
-    'Premium Wireless Headphones', 'Smart Watch Collection', 'Minimalist Backpack', 'Ergonomic Office Chair',
-    'Luxury Leather Wallet', 'Wireless Charging Pad', 'Premium Coffee Maker', 'Designer Sunglasses',
-    'Bluetooth Speaker Pro', 'Fitness Tracker Elite', 'Ceramic Dinnerware Set', 'Memory Foam Pillow',
-    'Stainless Steel Water Bottle', 'Organic Cotton Towels', 'LED Desk Lamp', 'Bamboo Cutting Board',
-    'Silk Pillowcase Set', 'Essential Oil Diffuser', 'Yoga Mat Premium', 'Wireless Mouse Pad',
-    'Artisan Coffee Beans', 'Handcrafted Jewelry Box', 'Smart Home Hub', 'Portable Phone Charger',
-    'Luxury Candle Collection', 'Ergonomic Keyboard', 'Premium Skincare Set', 'Wooden Desk Organizer',
-    'Bluetooth Earbuds Pro', 'Ceramic Plant Pots', 'Leather Journal', 'Smart Light Bulbs',
-    'Organic Face Mask Set', 'Stainless Steel Cookware', 'Wireless Headphone Stand', 'Premium Tea Collection',
-    'Bamboo Phone Case', 'Silk Sleep Mask', 'Smart Fitness Scale', 'Handwoven Throw Blanket',
-    'Premium Olive Oil', 'Ceramic Coffee Mug', 'Wireless Car Charger', 'Luxury Bath Bombs',
-    'Ergonomic Laptop Stand', 'Organic Cotton Sheets', 'Smart Water Bottle', 'Artisan Soap Set',
-    'Premium Notebook Set', 'Wireless Gaming Mouse', 'Ceramic Vase Collection', 'Luxury Hand Cream'
-  ];
-
-  const images = [
-    'https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/4219654/pexels-photo-4219654.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/4226796/pexels-photo-4226796.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/701877/pexels-photo-701877.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/3394651/pexels-photo-3394651.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/356056/pexels-photo-356056.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/416778/pexels-photo-416778.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/3685530/pexels-photo-3685530.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/3760044/pexels-photo-3760044.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/3760067/pexels-photo-3760067.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&cs=tinysrgb&w=500',
-    'https://images.pexels.com/photos/4041394/pexels-photo-4041394.jpeg?auto=compress&cs=tinysrgb&w=500'
-  ];
-
-  return Array.from({ length: 100 }, (_, index) => ({
-    id: index + 1,
-    name: productNames[index % productNames.length] + (index > productNames.length - 1 ? ` ${Math.floor(index / productNames.length) + 1}` : ''),
-    price: Math.floor(Math.random() * 400) + 50,
-    originalPrice: Math.floor(Math.random() * 200) + 300,
-    image: images[index % images.length],
-    rating: (Math.random() * 1.5 + 3.5).toFixed(1),
-    reviews: Math.floor(Math.random() * 200) + 20,
-    badge: badges[index % badges.length],
-    category: categories[index % categories.length],
-    inStock: Math.random() > 0.1,
-    isNew: Math.random() > 0.7,
-    onSale: Math.random() > 0.6
-  }));
-};
-
-const allProducts = generateProducts();
 
 function App() {
-  const [products, setProducts] = useState(allProducts);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(12);
   const [viewMode, setViewMode] = useState('grid');
@@ -85,11 +28,26 @@ function App() {
   const [showFilters, setShowFilters] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
+  const fetchProducts = async () => {
+  try {
+    const {data} = await axios.get('/api/product');
+    if(data.success){
+      setProducts(data.products);
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+useEffect(() => {
+  fetchProducts();
+}, [])
+
   const categories = ['all', 'Electronics', 'Fashion', 'Home & Living', 'Sports & Fitness', 'Beauty & Care', 'Books & Media', 'Accessories', 'Furniture'];
 
   // Filter and sort products
   useEffect(() => {
-    let filtered = allProducts;
+    let filtered = [...products];
 
     // Search filter
     if (searchQuery) {
@@ -121,21 +79,21 @@ function App() {
         filtered.sort((a, b) => b.rating - a.rating);
         break;
       case 'newest':
-        filtered.sort((a, b) => b.id - a.id);
+        filtered.sort((a, b) => b._id - a._id);
         break;
       default:
         // Featured - keep original order
         break;
     }
 
-    setProducts(filtered);
+     setFilteredProducts(filtered);
     setCurrentPage(1);
-  }, [searchQuery, selectedCategory, priceRange, sortBy]);
+  }, [searchQuery, selectedCategory, priceRange, sortBy, products]);
 
   // Pagination
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
   const totalPages = Math.ceil(products.length / productsPerPage);
 
 
@@ -221,7 +179,7 @@ function App() {
                 <h1 className="font-serif text-3xl md:text-4xl font-bold text-midnight-blue">
                   Premium Collection
                 </h1>
-                <p className="text-silver-mist mt-1">Discover {products.length} curated products</p>
+                <p className="text-silver-mist mt-1">Discover {filteredProducts.length} curated products</p>
               </div>
               <div className="flex items-center space-x-4">
                 <button className="bg-midnight-blue text-soft-white px-4 py-2 rounded-full hover:bg-royal-indigo transition-all duration-300 flex items-center space-x-2 font-medium">
@@ -396,13 +354,14 @@ function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {currentProducts.map((product, index) => (
                   <div 
-                    key={product.id} 
+                    key={product._id} 
                     className="bg-soft-white rounded-2xl shadow-sm border border-cool-gray/30 overflow-hidden group hover:shadow-xl hover:border-royal-indigo/30 transition-all duration-300 transform hover:-translate-y-1"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
+                    <Link to={`/product/${product._id}`}>
                     <div className="relative overflow-hidden">
                       <img 
-                        src={product.image} 
+                        src={product.images?.[0]} 
                         alt={product.name}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -419,6 +378,7 @@ function App() {
                         </div>
                       )}
                     </div>
+                    </Link>
                     
                     <div className="p-4">
                       <div className="flex items-center justify-between mb-2">
@@ -464,14 +424,15 @@ function App() {
               <div className="space-y-4">
                 {currentProducts.map((product, index) => (
                   <div 
-                    key={product.id} 
+                    key={product._id} 
                     className="bg-soft-white rounded-2xl shadow-sm border border-cool-gray/30 overflow-hidden group hover:shadow-lg hover:border-royal-indigo/30 transition-all duration-300"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
                     <div className="flex flex-col sm:flex-row">
-                      <div className="relative sm:w-48 h-48 sm:h-32 overflow-hidden">
+                      <Link to={`/product/${product._id}`}>
+                        <div className="relative sm:w-48 h-48 sm:h-32 overflow-hidden">
                         <img 
-                          src={product.image} 
+                          src={product.images?.[0]} 
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -488,6 +449,7 @@ function App() {
                           </div>
                         )}
                       </div>
+                      </Link>
                       
                       <div className="flex-1 p-4 flex flex-col justify-between">
                         <div>

@@ -1,57 +1,75 @@
-import { Heart, Star, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Heart, Star, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import axios from "../../../config/axios";
 
 const Featured = () => {
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Premium Wireless Headphones",
-      price: "$299",
-      originalPrice: "$399",
-      image:
-        "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500",
-      rating: 4.8,
-      reviews: 124,
-      badge: "Best Seller",
-      category: "Audio",
-    },
-    {
-      id: 2,
-      name: "Smart Watch Collection",
-      price: "$249",
-      originalPrice: "$329",
-      image:
-        "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500",
-      rating: 4.9,
-      reviews: 89,
-      badge: "New",
-      category: "Wearables",
-    },
-    {
-      id: 3,
-      name: "Minimalist Backpack",
-      price: "$129",
-      originalPrice: "$159",
-      image:
-        "https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg?auto=compress&cs=tinysrgb&w=500",
-      rating: 4.7,
-      reviews: 156,
-      badge: "Limited",
-      category: "Accessories",
-    },
-    {
-      id: 4,
-      name: "Ergonomic Office Chair",
-      price: "$399",
-      originalPrice: "$499",
-      image:
-        "https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg?auto=compress&cs=tinysrgb&w=500",
-      rating: 4.6,
-      reviews: 203,
-      badge: "Sale",
-      category: "Furniture",
-    },
-  ];
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  const fetchFeatured = async () => {
+    try {
+      const { data } = await axios.get("/api/product/latest");
+      if (data.success) {
+        setFeaturedProducts(data.latestProducts);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeatured();
+  }, []);
+  // const featuredProducts = [
+  //   {
+  //     id: 1,
+  //     name: "Premium Wireless Headphones",
+  //     price: "$299",
+  //     originalPrice: "$399",
+  //     image:
+  //       "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=500",
+  //     rating: 4.8,
+  //     reviews: 124,
+  //     badge: "Best Seller",
+  //     category: "Audio",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Smart Watch Collection",
+  //     price: "$249",
+  //     originalPrice: "$329",
+  //     image:
+  //       "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=500",
+  //     rating: 4.9,
+  //     reviews: 89,
+  //     badge: "New",
+  //     category: "Wearables",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Minimalist Backpack",
+  //     price: "$129",
+  //     originalPrice: "$159",
+  //     image:
+  //       "https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg?auto=compress&cs=tinysrgb&w=500",
+  //     rating: 4.7,
+  //     reviews: 156,
+  //     badge: "Limited",
+  //     category: "Accessories",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Ergonomic Office Chair",
+  //     price: "$399",
+  //     originalPrice: "$499",
+  //     image:
+  //       "https://images.pexels.com/photos/2883049/pexels-photo-2883049.jpeg?auto=compress&cs=tinysrgb&w=500",
+  //     rating: 4.6,
+  //     reviews: 203,
+  //     badge: "Sale",
+  //     category: "Furniture",
+  //   },
+  // ];
   return (
     <section className="py-20 bg-gradient-to-b from-soft-white to-lavender-tint/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,28 +86,30 @@ const Featured = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {featuredProducts.map((product, index) => (
             <div
-              key={product.id}
+              key={product._id}
               className="bg-soft-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="relative overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-midnight-blue text-soft-white px-3 py-1 rounded-full text-xs font-medium">
-                    {product.badge}
-                  </span>
+              <Link to={`/product/${product._id}`}>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={product.images?.[0]}
+                    alt={product.name}
+                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-midnight-blue text-soft-white px-3 py-1 rounded-full text-xs font-medium">
+                      {product.badge}
+                    </span>
+                  </div>
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <button className="bg-soft-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-soft-white shadow-lg">
+                      <Heart size={16} className="text-midnight-blue" />
+                    </button>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-midnight-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
                 </div>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <button className="bg-soft-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-soft-white shadow-lg">
-                    <Heart size={16} className="text-midnight-blue" />
-                  </button>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-midnight-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
-              </div>
+              </Link>
 
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
@@ -123,10 +143,10 @@ const Featured = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <span className="text-xl font-bold text-midnight-blue">
-                      {product.price}
+                      ${product.price}
                     </span>
                     <span className="text-sm text-silver-mist line-through">
-                      {product.originalPrice}
+                      ${product.originalPrice}
                     </span>
                   </div>
                   <button className="bg-lavender-tint hover:bg-royal-indigo text-midnight-blue hover:text-soft-white px-4 py-2 rounded-full transition-all duration-300 text-sm font-medium transform hover:scale-105">

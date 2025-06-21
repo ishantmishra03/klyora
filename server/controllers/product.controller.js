@@ -1,64 +1,64 @@
 import Product from '../models/product.models.js';
-import imagekit from '../config/imagekit.config.js';
+// import imagekit from '../config/imagekit.config.js';
 
-// Add New Product
-export const addProduct = async (req, res) => {
-  try {
-    const { name, description, price, originalPrice, category, subCategory } = req.body;
+// // Add New Product
+// export const addProduct = async (req, res) => {
+//   try {
+//     const { name, description, price, originalPrice, category, subCategory } = req.body;
 
-    // Validate required fields
-    if (!name || !description || !price || !category || !subCategory) {
-      return res.status(400).json({ success: false, error: 'Missing required fields' });
-    }
+//     // Validate required fields
+//     if (!name || !description || !price || !category || !subCategory) {
+//       return res.status(400).json({ success: false, error: 'Missing required fields' });
+//     }
 
-    // Ensure images are uploaded
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ success: false, message: "Please upload at least one image" });
-    }
+//     // Ensure images are uploaded
+//     if (!req.files || req.files.length === 0) {
+//       return res.status(400).json({ success: false, message: "Please upload at least one image" });
+//     }
 
-    // Upload images to ImageKit
-    const uploadPromises = req.files.map(file =>
-      imagekit.upload({
-        file: file.buffer,
-        fileName: file.originalname,
-      })
-    );
+//     // Upload images to ImageKit
+//     const uploadPromises = req.files.map(file =>
+//       imagekit.upload({
+//         file: file.buffer,
+//         fileName: file.originalname,
+//       })
+//     );
 
-    const uploadResults = await Promise.all(uploadPromises);
-    const images = uploadResults.map(img => img.url);
+//     const uploadResults = await Promise.all(uploadPromises);
+//     const images = uploadResults.map(img => img.url);
 
-    // Generate additional fields
-    const rating = (Math.random() * 1.5 + 3.5).toFixed(1); 
-    const reviews = Math.floor(Math.random() * 200) + 20;
-    const badges = ['Best Seller', 'New', 'Limited', 'Sale', 'Popular', 'Trending', 'Premium', 'Exclusive'];
-    const badge = badges[Math.floor(Math.random() * badges.length)];
-    const inStock = Math.random() > 0.1;
-    const isNew = Math.random() > 0.7;
-    const onSale = Math.random() > 0.6;
+//     // Generate additional fields
+//     const rating = (Math.random() * 1.5 + 3.5).toFixed(1); 
+//     const reviews = Math.floor(Math.random() * 200) + 20;
+//     const badges = ['Best Seller', 'New', 'Limited', 'Sale', 'Popular', 'Trending', 'Premium', 'Exclusive'];
+//     const badge = badges[Math.floor(Math.random() * badges.length)];
+//     const inStock = Math.random() > 0.1;
+//     const isNew = Math.random() > 0.7;
+//     const onSale = Math.random() > 0.6;
 
-    // Create product
-    const newProduct = await Product.create({
-      name,
-      description,
-      price,
-      originalPrice: originalPrice || Math.floor(Number(price) + Math.random() * 200),
-      images,
-      category,
-      subCategory,
-      rating,
-      reviews,
-      badge,
-      inStock,
-      isNew,
-      onSale
-    });
+//     // Create product
+//     const newProduct = await Product.create({
+//       name,
+//       description,
+//       price,
+//       originalPrice: originalPrice || Math.floor(Number(price) + Math.random() * 200),
+//       images,
+//       category,
+//       subCategory,
+//       rating,
+//       reviews,
+//       badge,
+//       inStock,
+//       isNew,
+//       onSale
+//     });
 
-    return res.status(201).json({ success: true, message: 'Product added successfully', product: newProduct });
-  } catch (error) {
-    console.error('Add Product Error:', error);
-    return res.status(500).json({ success: false, error: 'Server error' });
-  }
-};
+//     return res.status(201).json({ success: true, message: 'Product added successfully', product: newProduct });
+//   } catch (error) {
+//     console.error('Add Product Error:', error);
+//     return res.status(500).json({ success: false, error: 'Server error' });
+//   }
+// };
 
 // Delete Product
 export const deleteProduct = async (req, res) => {
@@ -89,7 +89,7 @@ export const getAllProducts = async (req, res) => {
 // Get Latest Products
 export const getLatestProducts = async (req, res) => {
   try {
-    const count = parseInt(req.query.count) || 8;
+    const count = parseInt(req.query.count) || 4;
     const latestProducts = await Product.find().sort({ createdAt: -1 }).limit(count);
 
     return res.status(200).json({ success: true, latestProducts });
@@ -102,7 +102,7 @@ export const getLatestProducts = async (req, res) => {
 // Get Product By ID
 export const getProductById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
 
     const product = await Product.findById(id);
 
