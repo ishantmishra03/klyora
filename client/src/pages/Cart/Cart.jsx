@@ -3,7 +3,7 @@ import {
   incrementCartItem,
   decrementCartItem,
   removeCartItem,
-  fetchCart
+  fetchCart,
 } from "../../redux/slices/cartSlice";
 import { Star, Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,7 +20,7 @@ export default function Cart() {
 
   const fetchCart1 = () => {
     dispatch(fetchCart());
-  }
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -44,7 +44,8 @@ export default function Cart() {
   return (
     <div className="min-h-screen bg-soft-white max-w-7xl mx-auto p-6">
       <h1 className="text-4xl font-serif font-bold text-midnight-blue mb-8">
-        Your Cart ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
+        Your Cart ({cartItems.length}{" "}
+        {cartItems.length === 1 ? "item" : "items"})
       </h1>
 
       <div className="space-y-6">
@@ -52,96 +53,103 @@ export default function Cart() {
           if (!product || !product._id) return null;
           return (
             <div
-            key={product._id}
-            className="flex flex-col sm:flex-row bg-soft-white border border-cool-gray rounded-2xl shadow-sm overflow-hidden"
-          >
-            {/* Product Image */}
-            <Link
-              to={`/product/${product._id}`}
-              className="sm:w-40 h-40 sm:h-auto flex-shrink-0 overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none"
+              key={product._id}
+              className="flex flex-col sm:flex-row bg-soft-white border border-cool-gray rounded-2xl shadow-sm overflow-hidden"
             >
-              <img
-                src={product.images?.[0]}
-                alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </Link>
+              {/* Product Image */}
+              <Link
+                to={`/product/${product._id}`}
+                className="sm:w-40 h-40 sm:h-auto flex-shrink-0 overflow-hidden rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none"
+              >
+                <img
+                  src={product.images?.[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </Link>
 
-            {/* Details */}
-            <div className="flex flex-col justify-between flex-1 p-4">
-              {/* Product Name & Category */}
-              <div>
-                <Link
-                  to={`/product/${product._id}`}
-                  className="font-semibold text-midnight-blue text-lg hover:text-royal-indigo transition"
-                >
-                  {product.name}
-                </Link>
-                <div className="mt-1 text-xs font-medium text-royal-indigo bg-royal-indigo/10 inline-block px-2 py-1 rounded-full">
-                  {product.category}
+              {/* Details */}
+              <div className="flex flex-col justify-between flex-1 p-4">
+                {/* Product Name & Category */}
+                <div>
+                  <Link
+                    to={`/product/${product._id}`}
+                    className="font-semibold text-midnight-blue text-lg hover:text-royal-indigo transition"
+                  >
+                    {product.name}
+                  </Link>
+                  <div className="mt-1 text-xs font-medium text-royal-indigo bg-royal-indigo/10 inline-block px-2 py-1 rounded-full">
+                    {product.category}
+                  </div>
+
+                  {/* Rating */}
+                  <div className="flex items-center mt-2 text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        fill={
+                          i < Math.floor(product.rating)
+                            ? "currentColor"
+                            : "none"
+                        }
+                      />
+                    ))}
+                    <span className="text-xs text-silver-mist ml-2">
+                      ({product.reviews})
+                    </span>
+                  </div>
                 </div>
 
-                {/* Rating */}
-                <div className="flex items-center mt-2 text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      fill={i < Math.floor(product.rating) ? "currentColor" : "none"}
-                    />
-                  ))}
-                  <span className="text-xs text-silver-mist ml-2">
-                    ({product.reviews})
-                  </span>
-                </div>
-              </div>
+                {/* Quantity Controls and Price */}
+                <div className="flex items-center justify-between mt-4">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={async () => {
+                        await dispatch(decrementCartItem(product._id));
+                        await fetchCart1();
+                      }}
+                      disabled={quantity <= 1}
+                      className="p-2 rounded-full border border-cool-gray hover:bg-lavender-tint disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus size={16} className="text-midnight-blue" />
+                    </button>
+                    <span className="text-lg font-semibold text-midnight-blue">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={async () => {
+                        await dispatch(incrementCartItem(product._id));
+                        await fetchCart1();
+                      }}
+                      className="p-2 rounded-full border border-cool-gray hover:bg-lavender-tint transition"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus size={16} className="text-midnight-blue" />
+                    </button>
+                  </div>
 
-              {/* Quantity Controls and Price */}
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center space-x-2">
+                  <div className="text-lg font-bold text-midnight-blue">
+                    ${(product.price * quantity).toFixed(2)}
+                  </div>
+
                   <button
-                    onClick={async() => {
-                      await dispatch(decrementCartItem(product._id));
+                    onClick={async () => {
+                      await dispatch(removeCartItem(product._id));
                       fetchCart1();
                     }}
-                    disabled={quantity <= 1}
-                    className="p-2 rounded-full border border-cool-gray hover:bg-lavender-tint disabled:opacity-50 disabled:cursor-not-allowed transition"
-                    aria-label="Decrease quantity"
+                    className="p-2 rounded-full text-red-600 hover:bg-red-100 transition"
+                    aria-label="Remove item"
+                    title="Remove item"
                   >
-                    <Minus size={16} className="text-midnight-blue" />
-                  </button>
-                  <span className="text-lg font-semibold text-midnight-blue">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={async() => {
-                      await dispatch(incrementCartItem(product._id));
-                      fetchCart1();
-                    }}
-                    className="p-2 rounded-full border border-cool-gray hover:bg-lavender-tint transition"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus size={16} className="text-midnight-blue" />
+                    <Trash2 size={20} />
                   </button>
                 </div>
-
-                <div className="text-lg font-bold text-midnight-blue">
-                  ${(product.price * quantity).toFixed(2)}
-                </div>
-
-                <button
-                  onClick={() => dispatch(removeCartItem(product._id))}
-                  className="p-2 rounded-full text-red-600 hover:bg-red-100 transition"
-                  aria-label="Remove item"
-                  title="Remove item"
-                >
-                  <Trash2 size={20} />
-                </button>
               </div>
             </div>
-          </div>
-          )
-})}
+          );
+        })}
       </div>
 
       {/* Summary */}

@@ -1,6 +1,6 @@
 import express from 'express';
 const adminRouter = express.Router();
-import { protect } from '../middlewares/auth.middleware.js';
+import { protect } from '../middlewares/admin.middleware.js';
 import { adminLogin, adminLogout, isAuthenticated } from '../controllers/admin.controller.js';
 
 adminRouter.post('/login', adminLogin);

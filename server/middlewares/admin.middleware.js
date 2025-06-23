@@ -1,15 +1,16 @@
-import User from '../models/user.models.js';
+import jwt from 'jsonwebtoken';
 
-export const isAdmin = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.userId); 
+export const protect = async (req,res,next) => {
+    try {
+        const { token } = req.cookies;
 
-    if (!user || !user.isAdmin) {
-      return res.status(403).json({ success: false, message: "Access denied" });
+        if(!token){
+            return res.status(401).json({success: false, message : "Not Authorized"});
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        next();
+    } catch (error) {
+        return res.status(401).json({success: false, message : error.message});
     }
-
-    next();
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
 };

@@ -1,65 +1,70 @@
-import { useState, useEffect } from "react";
-import Footer from '../components/Footer/Footer';
-import { useParams } from 'react-router-dom';
-import axios from '../config/axios'
+import { useState, useEffect, useCallback } from "react";
+import Footer from "../components/Footer/Footer";
+import { useParams } from "react-router-dom";
+import axios from "../config/axios";
 import {
   Star,
   ShoppingBag,
   Heart,
-  Share2,
-  Truck,
-  Shield,
-  RefreshCw,
   ChevronLeft,
   ChevronRight,
   Plus,
   Minus,
   Check,
   X,
-  Award,
-  Clock,
-  Package,
-  CreditCard,
-  ArrowLeft,
   Zap,
-  Users,
-  MessageCircle,
-  ThumbsUp,
-  ChevronDown,
-  Info,
 } from "lucide-react";
-import Loader from '../components/Loader/Loader';
-
-
-
+import Loader from "../components/Loader/Loader";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  addToCart,
+  removeCartItem,
+  fetchCart,
+} from "../redux/slices/cartSlice";
 
 function Product() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items) || [];
+  //Check if in cart or not
+  const isInCart = (productId) => {
+    return cartItems.some((item) => item.product._id === productId);
+  };
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const buyNow = () => {
     alert("Redirecting to checkout...");
   };
 
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
-      const {data} = await axios.post('/api/product/by-id', {id});
-      if(data.success){
-          setProduct(data.product);
+      const { data } = await axios.post("/api/product/by-id", { id });
+      if (data.success) {
+        setProduct(data.product);
       }
     } catch (error) {
       console.log(error.message);
     }
-  }
+  },[id]);
+
+
+  const handleCartToggle = async () => {
+    if (isInCart(id)) {
+      await dispatch(removeCartItem(id));
+      dispatch(fetchCart());
+    } else {
+      await dispatch(addToCart(id));
+      dispatch(fetchCart());
+    }
+  };
 
   useEffect(() => {
     fetchProduct();
-  }, [])
+  }, [fetchProduct]);
 
-  if(!product) return <Loader />;
+  if (!product) return <Loader />;
 
   return (
     <div className="min-h-screen bg-soft-white">
@@ -207,52 +212,26 @@ function Product() {
               )}
             </div>
 
-            {/* Quantity */}
-            <div>
-              <h3 className="font-semibold text-midnight-blue mb-3">
-                Quantity
-              </h3>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center border border-cool-gray rounded-lg">
-                  <button
-                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                    className="p-3 hover:bg-lavender-tint transition-colors"
-                  >
-                    <Minus size={16} className="text-midnight-blue" />
-                  </button>
-                  <span className="px-4 py-3 font-medium text-midnight-blue min-w-[3rem] text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() =>
-                      setQuantity((prev) =>
-                        Math.min(product?.stockCount ?? Infinity, prev + 1)
-
-                      )
-                    }
-                    className="p-3 hover:bg-lavender-tint transition-colors"
-                  >
-                    <Plus size={16} className="text-midnight-blue" />
-                  </button>
-                </div>
-                <span className="text-silver-mist">
-                  Total:{" "}
-                  <span className="font-semibold text-midnight-blue">
-                    ${(product.price * quantity).toFixed(2)}
-                  </span>
-                </span>
-              </div>
-            </div>
+            
 
             {/* Action Buttons */}
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
+                  onClick={handleCartToggle}
                   disabled={!product.inStock}
-                  className="flex-1 bg-midnight-blue text-soft-white px-6 py-4 rounded-full hover:bg-royal-indigo transition-all duration-300 font-medium flex items-center justify-center space-x-2 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className={`flex-1 ${
+                    isInCart(id)
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-midnight-blue hover:bg-royal-indigo"
+                  } text-soft-white px-6 py-4 rounded-full  transition-all duration-300 font-medium flex items-center justify-center space-x-2 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                 >
                   <ShoppingBag size={18} />
-                  <span>Add to Cart</span>
+                  {isInCart(id) ? (
+                    <span>Remove From Cart</span>
+                  ) : (
+                    <span>Add To Cart</span>
+                  )}
                 </button>
                 <button
                   onClick={buyNow}
@@ -279,8 +258,6 @@ function Product() {
             </div>
           </div>
         </div>
-
-        
       </div>
 
       <div className="mt-20">
