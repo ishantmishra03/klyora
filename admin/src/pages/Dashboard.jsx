@@ -1,5 +1,5 @@
 import { useAppContext } from "../context/AppContext";
-import { LogOut, PlusCircle, ShoppingBag } from "lucide-react";
+import { LogOut, PlusCircle, ShoppingBag, BaggageClaim } from "lucide-react";
 import { Link } from 'react-router-dom';
 
 const sampleOrders = [
@@ -62,6 +62,13 @@ export default function Dashboard() {
             <PlusCircle size={18} />
             Dashboard
           </button>
+          <Link
+            to="/products"
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl"
+          >
+            <BaggageClaim size={18} />
+            Products
+          </Link>
           <Link to="/add-product" className="flex items-center gap-2 w-full px-4 py-2 rounded-xl hover:bg-lavender-tint transition">
             <PlusCircle size={18} />
             Add Product

@@ -1,6 +1,15 @@
 import { useState } from "react";
-import { LogOut, PlusCircle, ShoppingBag, UploadCloud, X, HomeIcon } from "lucide-react";
+import {
+  LogOut,
+  PlusCircle,
+  ShoppingBag,
+  BaggageClaim,
+  X,
+  HomeIcon,
+} from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import axios from "../config/axios";
+import { toast } from "react-hot-toast";
 
 export default function AddProduct() {
   const { navigate, logout } = useAppContext();
@@ -40,6 +49,7 @@ export default function AddProduct() {
   });
 
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files).slice(0, 4);
@@ -56,17 +66,69 @@ export default function AddProduct() {
     }));
   };
 
-  const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Product Submitted:", form);
-    alert("Submit logic not connected. Implement API call.");
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("price", form.price);
+      formData.append("originalPrice", form.originalPrice);
+      formData.append("category", form.category);
+      formData.append("subCategory", form.subCategory);
+      formData.append("badge", form.badge);
+      formData.append("inStock", form.inStock);
+      formData.append("isNew", form.isNew);
+      formData.append("onSale", form.onSale);
+
+      
+      form.images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      const { data } = await axios.post("/api/product", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+        // Optionally reset form here
+        setForm({
+          name: "",
+          description: "",
+          price: "",
+          originalPrice: "",
+          category: "",
+          subCategory: "",
+          badge: "",
+          images: [],
+          inStock: true,
+          isNew: false,
+          onSale: false,
+        });
+        setImagePreviews([]);
+      } else {
+        toast.error(data.error || "Failed to add product");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.error || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-soft-white text-midnight-blue">
       {/* Navbar */}
       <nav className="bg-midnight-blue text-soft-white px-6 py-4 flex justify-between items-center shadow-md">
-        <div className="text-2xl font-bold tracking-wide font-serif">Klyora</div>
+        <div className="text-2xl font-bold tracking-wide font-serif">
+          Klyora
+        </div>
         <button
           onClick={logout}
           className="flex items-center gap-2 bg-soft-white text-midnight-blue px-4 py-2 rounded-full hover:bg-lavender-tint transition"
@@ -80,11 +142,24 @@ export default function AddProduct() {
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <aside className="w-full md:w-64 bg-lavender-tint/40 border-r border-cool-gray p-4 space-y-4">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 w-full px-4 py-2 rounded-xl">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl"
+          >
             <HomeIcon size={18} />
             Dashboard
           </button>
-          <button onClick={() => navigate('/add-product')} className="flex items-center gap-2 w-full px-4 py-2 rounded-xl bg-lavender-tint">
+          <button
+            onClick={() => navigate("/products")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl"
+          >
+            <BaggageClaim size={18} />
+            Products
+          </button>
+          <button
+            onClick={() => navigate("/add-product")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl bg-lavender-tint"
+          >
             <PlusCircle size={18} />
             Add Product
           </button>
@@ -99,8 +174,14 @@ export default function AddProduct() {
 
         {/* Form */}
         <main className="flex-1 p-6">
-          <h2 className="text-2xl font-serif font-bold mb-6">Add New Product</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h2 className="text-2xl font-serif font-bold mb-6">
+            Add New Product
+          </h2>
+          <form
+          encType="multipart/form-data"
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             <input
               type="text"
               name="name"
@@ -216,10 +297,13 @@ export default function AddProduct() {
 
             {/* Image Upload */}
             <div className="md:col-span-2">
-              <label className="block mb-2 font-medium">Upload up to 4 Images</label>
+              <label className="block mb-2 font-medium">
+                Upload up to 4 Images
+              </label>
               <input
                 type="file"
                 accept="image/*"
+                name="images"
                 multiple
                 onChange={handleImageUpload}
                 className="border border-cool-gray rounded-lg p-3 w-full"
@@ -250,6 +334,7 @@ export default function AddProduct() {
             </div>
 
             <button
+              disabled={loading}
               type="submit"
               className="md:col-span-2 bg-midnight-blue text-soft-white py-3 rounded-full hover:bg-royal-indigo transition"
             >

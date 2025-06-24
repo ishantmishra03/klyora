@@ -114,7 +114,7 @@ const Navbar = () => {
                   className="bg-midnight-blue text-soft-white px-4 py-2 rounded-full hover:bg-royal-indigo transition-all duration-300 flex items-center space-x-2 font-medium"
                 >
                   <ShoppingBag size={16} />
-                  <span>Cart ({cartCount})</span>
+                  <span>Cart ({cartItems.length})</span>
                 </Link>
               </div>
             )}

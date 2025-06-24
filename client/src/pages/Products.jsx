@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "../config/axios";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { addToCart, removeCartItem, fetchCart } from "../redux/slices/cartSlice";
+import {
+  addToCart,
+  removeCartItem,
+  fetchCart,
+} from "../redux/slices/cartSlice";
 import {
   Star,
   ShoppingBag,
@@ -16,13 +20,12 @@ import {
   X,
 } from "lucide-react";
 
-function App() {
+function Products() {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items) || [];
   const isInCart = (productId) => {
     return cartItems.some((item) => item.product._id === productId);
-  }
-    
+  };
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -31,7 +34,7 @@ function App() {
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("featured");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [priceRange, setPriceRange] = useState([0, 5000]);
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -40,6 +43,7 @@ function App() {
       const { data } = await axios.get("/api/product");
       if (data.success) {
         setProducts(data.products);
+        console.log(data.products);
       }
     } catch (error) {
       console.log(error.message);
@@ -50,6 +54,15 @@ function App() {
     fetchProducts();
     dispatch(fetchCart());
   }, [dispatch]);
+
+  useEffect(() => {
+  if (products.length > 0) {
+    const prices = products.map((p) => p.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    setPriceRange([minPrice, maxPrice]);
+  }
+}, [products]);
 
   const categories = [
     "all",
@@ -77,9 +90,10 @@ function App() {
     }
 
     // Category filter
-    if (selectedCategory !== "all") {
+    if (selectedCategory.toLowerCase() !== "all") {
       filtered = filtered.filter(
-        (product) => product.category === selectedCategory
+        (product) =>
+          product.category.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
@@ -104,7 +118,6 @@ function App() {
         filtered.sort((a, b) => b._id - a._id);
         break;
       default:
-        // Featured - keep original order
         break;
     }
 
@@ -121,16 +134,15 @@ function App() {
   );
   const totalPages = Math.ceil(products.length / productsPerPage);
 
-  const handleCartToggle =  async (productId) => {
+  const handleCartToggle = async (productId) => {
     if (isInCart(productId)) {
-       await dispatch(removeCartItem(productId));
-       dispatch(fetchCart());
+      await dispatch(removeCartItem(productId));
+      dispatch(fetchCart());
     } else {
-       await dispatch(addToCart(productId));
-       dispatch(fetchCart()); 
+      await dispatch(addToCart(productId));
+      dispatch(fetchCart());
     }
   };
-
 
   //Pagination
   const Pagination = () => {
@@ -221,7 +233,10 @@ function App() {
                 </p>
               </div>
               <div className="flex items-center space-x-4">
-                <Link to="/cart" className="bg-midnight-blue text-soft-white px-4 py-2 rounded-full hover:bg-royal-indigo transition-all duration-300 flex items-center space-x-2 font-medium">
+                <Link
+                  to="/cart"
+                  className="bg-midnight-blue text-soft-white px-4 py-2 rounded-full hover:bg-royal-indigo transition-all duration-300 flex items-center space-x-2 font-medium"
+                >
                   <ShoppingBag size={16} />
                   <span className="hidden sm:inline">Cart</span>
                   <span>({cartItems.length})</span>
@@ -486,12 +501,14 @@ function App() {
                           onClick={() => handleCartToggle(product._id)}
                           disabled={!product.inStock}
                           className={`${
-                           isInCart(product._id)
+                            isInCart(product._id)
                               ? "bg-red-100 hover:bg-red-500 text-red-600 hover:text-white"
                               : "bg-lavender-tint hover:bg-royal-indigo text-midnight-blue hover:text-soft-white"
                           } px-3 py-2 rounded-full transition-all duration-300 text-sm font-medium transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
-                           {isInCart(product._id) ? "Remove from Cart" : "Add to Cart"}
+                          {isInCart(product._id)
+                            ? "Remove from Cart"
+                            : "Add to Cart"}
                         </button>
                       </div>
                     </div>
@@ -571,16 +588,18 @@ function App() {
                           </div>
                           <div className="flex items-center space-x-2">
                             <button
-                          onClick={() => handleCartToggle(product._id)}
-                          disabled={!product.inStock}
-                          className={`${
-                           isInCart(product._id)
-                              ? "bg-red-100 hover:bg-red-500 text-red-600 hover:text-white"
-                              : "bg-lavender-tint hover:bg-royal-indigo text-midnight-blue hover:text-soft-white"
-                          } px-3 py-2 rounded-full transition-all duration-300 text-sm font-medium transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                           {isInCart(product._id) ? "Remove from Cart" : "Add to Cart"}
-                        </button>
+                              onClick={() => handleCartToggle(product._id)}
+                              disabled={!product.inStock}
+                              className={`${
+                                isInCart(product._id)
+                                  ? "bg-red-100 hover:bg-red-500 text-red-600 hover:text-white"
+                                  : "bg-lavender-tint hover:bg-royal-indigo text-midnight-blue hover:text-soft-white"
+                              } px-3 py-2 rounded-full transition-all duration-300 text-sm font-medium transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                              {isInCart(product._id)
+                                ? "Remove from Cart"
+                                : "Add to Cart"}
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -606,4 +625,4 @@ function App() {
   );
 }
 
-export default App;
+export default Products;

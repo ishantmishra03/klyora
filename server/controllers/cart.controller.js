@@ -9,7 +9,7 @@ export const addToCart = async (req, res) => {
     if (!productId) {
       return res.status(400).json({ success: false, message: 'Product ID is required' });
     }
-
+    const product = await Product.find();
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -17,7 +17,7 @@ export const addToCart = async (req, res) => {
 
     const exists = user.cart.find(item => item.product.toString() === productId);
     if (exists) {
-      return res.status(400).json({ success: false, message: 'Product already in cart' });
+      return res.status(400).json({ success: false, message: 'Product already in cart', cart : product });
     }
 
     user.cart.push({ product: productId, quantity: 1 });

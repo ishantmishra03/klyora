@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ListOrders from './pages/ListOrders';
 import AddProduct from './pages/AddProduct';
+import Products from './pages/Products';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -24,6 +25,11 @@ const App = () => {
         <Route path='/orders' element={
           <ProtectedRoute>
             <ListOrders />
+          </ProtectedRoute>
+        }/>
+        <Route path='/products' element={
+          <ProtectedRoute>
+            <Products />
           </ProtectedRoute>
         }/>
       </Routes>

@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { LogOut, PlusCircle, ShoppingBag, Trash2, HomeIcon } from "lucide-react";
+import {
+  LogOut,
+  PlusCircle,
+  ShoppingBag,
+  Trash2,
+  HomeIcon,
+  BaggageClaim,
+} from "lucide-react";
 
 const sampleOrders = [
   {
@@ -29,7 +36,6 @@ export default function AdminOrders() {
   const { navigate, logout } = useAppContext();
   const [orders, setOrders] = useState(sampleOrders);
 
-
   const updateStatus = (id, newStatus) => {
     setOrders((prev) =>
       prev.map((order) =>
@@ -39,7 +45,9 @@ export default function AdminOrders() {
   };
 
   const deleteOrder = (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this order?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this order?"
+    );
     if (confirm) {
       setOrders((prev) => prev.filter((order) => order.id !== id));
     }
@@ -49,7 +57,9 @@ export default function AdminOrders() {
     <div className="min-h-screen bg-soft-white text-midnight-blue">
       {/* Navbar */}
       <nav className="bg-midnight-blue text-soft-white px-6 py-4 flex justify-between items-center shadow-md">
-        <div className="text-2xl font-bold tracking-wide font-serif">Klyora</div>
+        <div className="text-2xl font-bold tracking-wide font-serif">
+          Klyora
+        </div>
         <button
           onClick={logout}
           className="flex items-center gap-2 bg-soft-white text-midnight-blue px-4 py-2 rounded-full hover:bg-lavender-tint transition"
@@ -63,10 +73,20 @@ export default function AdminOrders() {
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <aside className="w-full md:w-64 bg-lavender-tint/40 border-r border-cool-gray p-4 space-y-4">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 w-full px-4 py-2 rounded-xl">
-                    <HomeIcon size={18} />
-                    Dashboard
-                  </button>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl"
+          >
+            <HomeIcon size={18} />
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/products")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl"
+          >
+            <BaggageClaim size={18} />
+            Products
+          </button>
           <button
             onClick={() => navigate("/add-product")}
             className="flex items-center gap-2 w-full px-4 py-2 rounded-xl hover:bg-lavender-tint transition"
@@ -74,9 +94,10 @@ export default function AdminOrders() {
             <PlusCircle size={18} />
             Add Product
           </button>
-          <button 
-          onClick={() => navigate("orders")}
-          className="flex items-center gap-2 w-full px-4 py-2 rounded-xl bg-lavender-tint">
+          <button
+            onClick={() => navigate("orders")}
+            className="flex items-center gap-2 w-full px-4 py-2 rounded-xl bg-lavender-tint"
+          >
             <ShoppingBag size={18} />
             Orders
           </button>
@@ -117,7 +138,9 @@ export default function AdminOrders() {
                     <option value="Delivered">Delivered</option>
                   </select>
 
-                  <div className="text-lg font-medium">${order.price.toFixed(2)}</div>
+                  <div className="text-lg font-medium">
+                    ${order.price.toFixed(2)}
+                  </div>
 
                   <button
                     onClick={() => deleteOrder(order.id)}
