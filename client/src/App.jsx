@@ -13,6 +13,8 @@ import Product from "./pages/Product";
 import Orders from './pages/Orders';
 import Cart from "./pages/Cart/Cart";
 import Checkout from './pages/Checkout';
+import Success from './pages/Stripe/Success';
+import Cancel from './pages/Stripe/Cancel';
 import ProtectedRoute from "./config/ProtectedRoute";
 
 const App = () => {
@@ -75,6 +77,22 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/success"
+          element={
+            <ProtectedRoute>
+              <Success />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cancel"
+          element={
+            <ProtectedRoute>
+              <Cancel />
             </ProtectedRoute>
           }
         />
