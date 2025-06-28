@@ -1,34 +1,34 @@
-import Stripe from "stripe";
-
+import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const createStripeSession = async (req, res) => {
+export const createCheckoutSession = async (req, res) => {
   try {
-    const { cartItems, customerEmail } = req.body;
+    const { cartItems } = req.body;
 
-    const line_items = cartItems.map(item => ({
+    // map your cartItems to Stripe line items
+    const lineItems = cartItems.map(({ product, quantity }) => ({
       price_data: {
-        currency: "usd",
+        currency: 'usd',
         product_data: {
-          name: item.product.name,
-          images: [item.product.images[0]],
+          name: product.name,
+          images: [product.images?.[0]],
         },
-        unit_amount: Math.round(item.product.price * 100),
+        unit_amount: Math.round(product.price * 100), // in cents
       },
-      quantity: item.quantity,
+      quantity,
     }));
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items,
-      customer_email: customerEmail,
-      success_url: `${process.env.CLIENT_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/checkout/cancel`,
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
 
-    res.json({ url: session.url });
+    return res.status(200).json({ session });  // <-- Important: send session object here
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Stripe session error:', error);
+    return res.status(500).json({ error: error.message });
   }
 };

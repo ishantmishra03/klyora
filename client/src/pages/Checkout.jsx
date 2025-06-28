@@ -4,7 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import axios from "../config/axios";
 import { toast } from 'react-hot-toast';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export default function Checkout() {
   const cartItems = useSelector((state) => state.cart.items ?? []);
