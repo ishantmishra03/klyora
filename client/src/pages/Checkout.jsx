@@ -1,82 +1,38 @@
-import { useState } from "react";
+import { ShoppingBag, MapPin, CreditCard } from "lucide-react";
 import { useSelector } from "react-redux";
-import { CreditCard, MapPin, ShoppingBag } from "lucide-react";
-import {toast} from "react-hot-toast";
+import { loadStripe } from "@stripe/stripe-js";
 import axios from "../config/axios";
+import { toast } from 'react-hot-toast';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export default function Checkout() {
   const cartItems = useSelector((state) => state.cart.items ?? []);
-
-  const [form, setForm] = useState({
-    customerName: "",
-    customerEmail: "",
-    customerPhone: "",
-    address: "",
-    city: "",
-    country: "",
-    zip: "",
-  });
-
-  const [loading, setLoading] = useState(false);
-
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.product.price * item.quantity,
     0
   );
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleStripePayment = async () => {
-    const fullAddress = `${form.address}, ${form.city}, ${form.country} - ${form.zip}`.trim();
-
-    if (
-      !form.customerName ||
-      !form.customerEmail ||
-      !form.customerPhone ||
-      !form.address ||
-      !form.city ||
-      !form.country ||
-      !form.zip
-    ) {
-      toast.error("Please fill in all shipping details.");
-      return;
-    }
-
-    const products = cartItems.map(({ product, quantity }) => ({
-      productId: product._id,
-      quantity,
-    }));
-
+  const handleStripeCheckout = async () => {
     try {
-      setLoading(true);
-      const {data} = await axios.post(
-        "/api/order/create",
-        {
-          customerName: form.customerName,
-          customerEmail: form.customerEmail,
-          customerPhone: form.customerPhone,
-          address: fullAddress,
-          paymentMethod: "Stripe",
-          products,
-          totalPrice: totalPrice + 5,
-        }
-      );
+      const stripe = await stripePromise;
 
-      toast.success(data.message);
-      // Optional: clear cart or navigate to order summary
-    } catch (err) {
-      toast.error(err.message || "Order failed.");
-    } finally {
-      setLoading(false);
+      const response = await axios.post("/api/payment/create-checkout-session", {
+        cartItems,
+      });
+
+      const session = response.data.session;
+      await stripe.redirectToCheckout({ sessionId: session.id });
+    } catch (error) {
+      console.error("Stripe Checkout Error:", error);
+      toast.error("Failed to redirect to Stripe Checkout.");
     }
   };
 
   return (
     <div className="min-h-screen bg-soft-white text-midnight-blue">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Left: Order Summary */}
+        {/* Cart Summary */}
         <div className="lg:col-span-1">
           <h2 className="text-2xl font-bold mb-6">Your Order</h2>
           <div className="space-y-4">
@@ -94,7 +50,7 @@ export default function Checkout() {
                   <div>
                     <h4 className="font-semibold text-base">{product.name}</h4>
                     <p className="text-silver-mist text-sm">
-                      {quantity} × ${product.price}
+                      {quantity} x ${product.price}
                     </p>
                   </div>
                 </div>
@@ -106,12 +62,12 @@ export default function Checkout() {
           </div>
 
           <div className="border-t mt-6 pt-4 space-y-2">
-            <div className="flex justify-between text-silver-mist">
-              <span>Subtotal</span>
+            <div className="flex justify-between">
+              <span className="text-silver-mist">Subtotal</span>
               <span>${totalPrice.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-silver-mist">
-              <span>Shipping</span>
+            <div className="flex justify-between">
+              <span className="text-silver-mist">Shipping</span>
               <span>$5.00</span>
             </div>
             <div className="flex justify-between font-bold text-lg">
@@ -121,78 +77,22 @@ export default function Checkout() {
           </div>
         </div>
 
-        {/* Right: Shipping & Payment */}
+        {/* Shipping + Payment */}
         <div className="lg:col-span-2 space-y-10">
-          {/* Shipping Form */}
+          {/* Shipping Address */}
           <div className="bg-lavender-tint/50 p-6 rounded-3xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
               <MapPin size={18} />
               <span>Shipping Address</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input
-  name="customerName"
-  value={form.customerName}
-  onChange={handleChange}
-  type="text"
-  placeholder="Full Name"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="customerPhone"
-  value={form.customerPhone}
-  onChange={handleChange}
-  type="text"
-  placeholder="Phone Number"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="customerEmail"
-  value={form.customerEmail}
-  onChange={handleChange}
-  type="email"
-  placeholder="Email Address"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="zip"
-  value={form.zip}
-  onChange={handleChange}
-  type="text"
-  placeholder="Zip / Postal Code"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="address"
-  value={form.address}
-  onChange={handleChange}
-  type="text"
-  placeholder="Street Address"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="city"
-  value={form.city}
-  onChange={handleChange}
-  type="text"
-  placeholder="City"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
-<input
-  name="country"
-  value={form.country}
-  onChange={handleChange}
-  type="text"
-  placeholder="Country"
-  className="w-full px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo"
-/>
-
+              <input type="text" placeholder="Full Name" className="input" />
+              <input type="text" placeholder="Phone Number" className="input" />
+              <input type="email" placeholder="Email Address" className="input" />
+              <input type="text" placeholder="Zip / Postal Code" className="input" />
+              <input type="text" placeholder="Street Address" className="input sm:col-span-2" />
+              <input type="text" placeholder="City" className="input" />
+              <input type="text" placeholder="Country" className="input" />
             </div>
           </div>
 
@@ -200,19 +100,17 @@ export default function Checkout() {
           <div className="bg-lavender-tint/50 p-6 rounded-3xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2">
               <CreditCard size={18} />
-              <span>Pay with Stripe</span>
+              <span>Payment</span>
             </h3>
-            <p className="text-silver-mist mb-4">
-              You'll be redirected to Stripe to complete your secure payment.
-            </p>
-            <button
-              disabled={loading}
-              onClick={handleStripePayment}
-              className="bg-midnight-blue hover:bg-royal-indigo text-soft-white px-8 py-4 rounded-full text-lg font-semibold flex items-center space-x-2 transition-transform hover:scale-105 disabled:opacity-50"
-            >
-              <ShoppingBag size={20} />
-              <span>{loading ? "Placing Order..." : "Place Order with Stripe"}</span>
-            </button>
+            <div className="text-right">
+              <button
+                onClick={handleStripeCheckout}
+                className="bg-midnight-blue hover:bg-royal-indigo text-soft-white px-8 py-4 rounded-full text-lg font-semibold flex items-center space-x-2 transition-transform hover:scale-105"
+              >
+                <ShoppingBag size={20} />
+                <span>Pay with Stripe</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
