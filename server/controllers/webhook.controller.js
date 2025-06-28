@@ -39,7 +39,6 @@ export const stripeWebhook = async (req, res) => {
         products,
         totalPrice,
         isPaid: true,
-        user: user ? user._id : null,
       });
 
       // Add order to user and clear their cart

@@ -28,7 +28,16 @@ app.use(cors({
 }));
 
 // ⚠️ Stripe Webhook BEFORE any body parser
-app.use("/api/webhook", express.raw({ type: "application/json" }), stripeWebhook);
+app.use(
+  '/api/webhook',
+  express.raw({ type: 'application/json' }),
+  (req, res, next) => {
+    req.rawBody = req.body; // Save raw body for stripe to use
+    next();
+  },
+  stripeWebhook
+);
+
 
 // Standard Middleware AFTER webhook
 app.use(express.json());

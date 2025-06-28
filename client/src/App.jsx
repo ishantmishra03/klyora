@@ -83,17 +83,13 @@ const App = () => {
         <Route
           path="/success"
           element={
-            <ProtectedRoute>
               <Success />
-            </ProtectedRoute>
           }
         />
         <Route
           path="/cancel"
           element={
-            <ProtectedRoute>
               <Cancel />
-            </ProtectedRoute>
           }
         />
         <Route
