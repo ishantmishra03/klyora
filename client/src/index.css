@@ -50,3 +50,7 @@ h1, h2 {
 .to-royal-indigo{
   background-color: #3C4A9A;
 }
+
+.input {
+  @apply px-4 py-3 rounded-xl border border-cool-gray bg-soft-white text-midnight-blue placeholder-silver-mist focus:outline-none focus:ring-2 focus:ring-royal-indigo;
+}

@@ -1,6 +1,8 @@
-import express from 'express';
-const paymentRouter = express.Router();
-import { } from "../controllers/payment.controller.js";
-import { protect } from "../middlewares/auth.middleware.js"
+import express from "express";
+import { createStripeSession } from "../controllers/payment.controller.js";
 
-export default paymentRouter;
+const router = express.Router();
+
+router.post("/create-checkout-session", createStripeSession);
+
+export default router;

@@ -4,6 +4,8 @@ import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
+import { stripeWebhook } from "./controllers/webhook.controller.js";
+
 import authRouter from './routes/auth.routes.js'
 import productRouter from './routes/product.routes.js';
 import cartRouter from './routes/cart.routes.js';
@@ -37,6 +39,14 @@ app.use(cors({
 //Middlewares
 app.use(express.json());
 app.use(cookieParser());
+
+//WebHook
+app.use(
+  "/api/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
+);
+
 
 //Routes
 app.use('/api/auth', authRouter);

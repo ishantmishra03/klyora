@@ -6,9 +6,10 @@ import {
   fetchCart,
 } from "../../redux/slices/cartSlice";
 import { Star, Minus, Plus, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Cart() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items ?? []);
 
@@ -158,8 +159,8 @@ export default function Cart() {
           Total: ${totalPrice.toFixed(2)}
         </div>
         <button
-          className="mt-4 sm:mt-0 bg-midnight-blue text-soft-white px-8 py-3 rounded-full hover:bg-royal-indigo transition font-medium"
-          onClick={() => alert("Proceed to checkout - implement this!")}
+          className="mt-4 sm:mt-0 bg-midnight-blue text-soft-white px-8 py-3 rounded-full hover:bg-royal-indigo font-medium cursor-pointer hover:scale-105 transition-all"
+          onClick={() => navigate('/checkout')}
         >
           Proceed to Checkout
         </button>
